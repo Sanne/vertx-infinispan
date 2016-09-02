@@ -40,90 +40,73 @@ public class InfinispanAsyncMap<K, V> implements AsyncMap<K, V> {
 
   @Override
   public void get(K k, Handler<AsyncResult<V>> resultHandler) {
-    Object kk = DataConverter.toCachedObject(k);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Object> futureAdapter = new FutureAdapter<>(context);
-    cache.getAsync(kk).attachListener(futureAdapter);
+    cache.getAsync(k).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().map(DataConverter::<V>fromCachedObject).setHandler(resultHandler);
   }
 
   @Override
   public void put(K k, V v, Handler<AsyncResult<Void>> completionHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object vv = DataConverter.toCachedObject(v);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Object> futureAdapter = new FutureAdapter<>(context);
-    cache.putAsync(kk, vv).attachListener(futureAdapter);
+    cache.putAsync(k, v).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().map((Void) null).setHandler(completionHandler);
   }
 
   @Override
   public void put(K k, V v, long ttl, Handler<AsyncResult<Void>> completionHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object vv = DataConverter.toCachedObject(v);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Object> futureAdapter = new FutureAdapter<>(context);
-    cache.putAsync(kk, vv, ttl, MILLISECONDS).attachListener(futureAdapter);
+    cache.putAsync(k, v, ttl, MILLISECONDS).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().map((Void) null).setHandler(completionHandler);
   }
 
   @Override
   public void putIfAbsent(K k, V v, Handler<AsyncResult<V>> completionHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object vv = DataConverter.toCachedObject(v);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Object> futureAdapter = new FutureAdapter<>(context);
-    cache.putIfAbsentAsync(kk, vv).attachListener(futureAdapter);
+    cache.putIfAbsentAsync(k, v).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().map(DataConverter::<V>fromCachedObject).setHandler(completionHandler);
   }
 
   @Override
   public void putIfAbsent(K k, V v, long ttl, Handler<AsyncResult<V>> completionHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object vv = DataConverter.toCachedObject(v);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Object> futureAdapter = new FutureAdapter<>(context);
-    cache.putIfAbsentAsync(kk, vv, ttl, MILLISECONDS).attachListener(futureAdapter);
+    cache.putIfAbsentAsync(k, v, ttl, MILLISECONDS).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().map(DataConverter::<V>fromCachedObject).setHandler(completionHandler);
   }
 
   @Override
   public void remove(K k, Handler<AsyncResult<V>> resultHandler) {
-    Object kk = DataConverter.toCachedObject(k);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Object> futureAdapter = new FutureAdapter<>(context);
-    cache.removeAsync(kk).attachListener(futureAdapter);
+    cache.removeAsync(k).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().map(DataConverter::<V>fromCachedObject).setHandler(resultHandler);
   }
 
   @Override
   public void removeIfPresent(K k, V v, Handler<AsyncResult<Boolean>> resultHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object vv = DataConverter.toCachedObject(v);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Boolean> futureAdapter = new FutureAdapter<>(context);
-    cache.removeAsync(kk, vv).attachListener(futureAdapter);
+    cache.removeAsync(k, v).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().setHandler(resultHandler);
   }
 
   @Override
   public void replace(K k, V v, Handler<AsyncResult<V>> resultHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object vv = DataConverter.toCachedObject(v);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Object> futureAdapter = new FutureAdapter<>(context);
-    cache.replaceAsync(kk, vv).attachListener(futureAdapter);
+    cache.replaceAsync(k, v).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().map(DataConverter::<V>fromCachedObject).setHandler(resultHandler);
   }
 
   @Override
   public void replaceIfPresent(K k, V oldValue, V newValue, Handler<AsyncResult<Boolean>> resultHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object oo = DataConverter.toCachedObject(oldValue);
-    Object nn = DataConverter.toCachedObject(newValue);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Boolean> futureAdapter = new FutureAdapter<>(context);
-    cache.replaceAsync(kk, oo, nn).attachListener(futureAdapter);
+    cache.replaceAsync(k, oldValue, newValue).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().setHandler(resultHandler);
   }
 

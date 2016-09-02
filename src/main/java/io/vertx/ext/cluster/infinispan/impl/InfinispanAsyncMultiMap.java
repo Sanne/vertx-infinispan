@@ -59,11 +59,9 @@ public class InfinispanAsyncMultiMap<K, V> implements AsyncMultiMap<K, V> {
 
   @Override
   public void add(K k, V v, Handler<AsyncResult<Void>> completionHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object vv = DataConverter.toCachedObject(v);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<String> futureAdapter = new FutureAdapter<>(context);
-    cache.putAsync(new MultiMapKey<>(kk, vv), VALUE).attachListener(futureAdapter);
+    cache.putAsync(new MultiMapKey<>(k, v), VALUE).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().map((Void) null).setHandler(completionHandler);
   }
 
@@ -75,21 +73,18 @@ public class InfinispanAsyncMultiMap<K, V> implements AsyncMultiMap<K, V> {
 
   @Override
   public void remove(K k, V v, Handler<AsyncResult<Boolean>> completionHandler) {
-    Object kk = DataConverter.toCachedObject(k);
-    Object vv = DataConverter.toCachedObject(v);
     Context context = vertx.getOrCreateContext();
     FutureAdapter<Boolean> futureAdapter = new FutureAdapter<>(context);
-    cache.removeAsync(new MultiMapKey<>(kk, vv), VALUE).attachListener(futureAdapter);
+    cache.removeAsync(new MultiMapKey<>(k, v), VALUE).attachListener(futureAdapter);
     futureAdapter.getVertxFuture().setHandler(completionHandler);
   }
 
   @Override
   public void removeAllForValue(V v, Handler<AsyncResult<Void>> completionHandler) {
-    Object vv = DataConverter.toCachedObject(v);
     vertx.executeBlocking(future -> {
       for (Iterator<MultiMapKey<Object, Object>> iterator = cache.keySet().iterator(); iterator.hasNext(); ) {
         MultiMapKey<Object, Object> next = iterator.next();
-        if (next.getValue().equals(vv)) {
+        if (next.getValue().equals(v)) {
           iterator.remove();
         }
       }
@@ -102,7 +97,7 @@ public class InfinispanAsyncMultiMap<K, V> implements AsyncMultiMap<K, V> {
     private final AtomicInteger idx;
 
     ChoosableIterableImpl(K k) {
-      this.kk = DataConverter.toCachedObject(k);
+      this.kk = k;
       idx = new AtomicInteger();
     }
 

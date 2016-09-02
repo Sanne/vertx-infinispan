@@ -16,59 +16,35 @@
 
 package io.vertx.ext.cluster.infinispan.impl;
 
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.shareddata.impl.ClusterSerializable;
-import org.infinispan.commons.marshall.Externalizer;
-import org.infinispan.commons.marshall.SerializeWith;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.Objects;
+import java.util.Set;
+
+import org.infinispan.commons.marshall.AdvancedExternalizer;
+import org.infinispan.commons.util.Util;
+
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.shareddata.impl.ClusterSerializable;
 
 /**
  * @author Thomas Segismont
+ * @author Sanne Grinovero
  */
-@SerializeWith(InfinispanClusterSerializable.ClusterSerializableExternalizer.class)
-public class InfinispanClusterSerializable {
-
-  private final ClusterSerializable data;
-
-  public InfinispanClusterSerializable(ClusterSerializable data) {
-    Objects.requireNonNull(data);
-    this.data = data;
-  }
-
-  public ClusterSerializable getData() {
-    return data;
-  }
+public class ClusterSerializableExternalizer implements AdvancedExternalizer<ClusterSerializable> {
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    InfinispanClusterSerializable that = (InfinispanClusterSerializable) o;
-    return data.equals(that.data);
-  }
-
-  @Override
-  public int hashCode() {
-    return data.hashCode();
-  }
-
-  public static class ClusterSerializableExternalizer implements Externalizer<InfinispanClusterSerializable> {
-    @Override
-    public void writeObject(ObjectOutput output, InfinispanClusterSerializable object) throws IOException {
-      output.writeUTF(object.data.getClass().getName());
+    public void writeObject(ObjectOutput output, ClusterSerializable data) throws IOException {
+      output.writeUTF(data.getClass().getName());
       Buffer buffer = Buffer.buffer();
-      object.data.writeToBuffer(buffer);
+      data.writeToBuffer(buffer);
       byte[] bytes = buffer.getBytes();
       output.writeInt(bytes.length);
       output.write(bytes);
     }
 
     @Override
-    public InfinispanClusterSerializable readObject(ObjectInput input) throws IOException, ClassNotFoundException {
+    public ClusterSerializable readObject(ObjectInput input) throws IOException, ClassNotFoundException {
       String className = input.readUTF();
       int length = input.readInt();
       byte[] bytes = new byte[length];
@@ -81,7 +57,17 @@ public class InfinispanClusterSerializable {
         throw new IllegalStateException(e);
       }
       clusterSerializable.readFromBuffer(0, Buffer.buffer(bytes));
-      return new InfinispanClusterSerializable(clusterSerializable);
+      return clusterSerializable;
     }
-  }
+
+    @Override
+    public Set<Class<? extends ClusterSerializable>> getTypeClasses() {
+      return Util.<Class<? extends ClusterSerializable>>asSet(ClusterSerializable.class);
+    }
+
+    @Override
+    public Integer getId() {
+      return ExternalizerIds.CLUSTER_SERIALIZABLE;
+    }
+
 }

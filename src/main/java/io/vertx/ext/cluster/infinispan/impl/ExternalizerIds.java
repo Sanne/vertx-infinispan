@@ -17,20 +17,23 @@
 package io.vertx.ext.cluster.infinispan.impl;
 
 /**
- * @author Thomas Segismont
+ * Identifiers used by the Marshaller to delegate to specialized Externalizers.
+ * For details, read http://infinispan.org/docs/9.0.x/user_guide/user_guide.html#preassigned_externalizer_id_ranges
+ *
+ * The range reserved for this modules is from 2000 to 2099.
+ *
+ * @author Sanne Grinovero
  */
-public class DataConverter {
+public interface ExternalizerIds {
 
-  public static <T> Object toCachedObject(T t) {
-    return t;
-  }
+  /**
+   * @see io.vertx.ext.cluster.infinispan.impl.ServerIDExternalizer
+   */
+  static final Integer SERVER_ID = 2000;
 
-  @SuppressWarnings("unchecked")
-  public static <T> T fromCachedObject(Object value) {
-    return (T) value;
-  }
+  /**
+   * @see io.vertx.ext.cluster.infinispan.impl.ClusterSerializableExternalizer
+   */
+  static final Integer CLUSTER_SERIALIZABLE = 2001;
 
-  private DataConverter() {
-    // Utility class
-  }
 }
